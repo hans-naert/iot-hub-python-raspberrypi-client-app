@@ -22,45 +22,46 @@ You can use the application to simulate temperature&humidity data and send to yo
 1. Open the `config.py` file.
 2. Change the `SIMULATED_DATA` value from `False` to `True`.
 
-## Step 3: Download and setup referenced modules
+## Step 3: Set up the Python environment
 
-1. Clone the client application to local:
+The application uses the [`azure-iot-device`](https://pypi.org/project/azure-iot-device/) SDK (Python 3). Recent Raspberry Pi OS versions block system-wide `pip install` (PEP 668), so use a virtual environment.
 
-   ```
-   sudo apt-get install git-core
-
-   git clone https://github.com/Azure-Samples/iot-hub-python-raspberrypi-client-app.git
+1. Install `RPi.GPIO` from the OS packages and clone the application:
 
    ```
+   sudo apt-get install git python3-venv python3-rpi.gpio
+   git clone https://github.com/hans-naert/iot-hub-python-raspberrypi-client-app.git
+   cd iot-hub-python-raspberrypi-client-app
+   ```
 
-2. Because the Azure IoT SDKs for Python are wrappers on top of the [SDKs for C][azure-iot-sdk-c], you will need to compile the C libraries if you want or need to generate the Python libraries from source code.
+2. Create a virtual environment. `--system-site-packages` makes the apt-installed `RPi.GPIO` visible inside it:
 
    ```
-   cd ./iot-hub-python-raspberrypi-client-app
-   sudo chmod u+x setup.sh
-   sudo ./setup.sh
+   python3 -m venv --system-site-packages .venv
+   source .venv/bin/activate
    ```
-   In the above script, we run **./setup.sh** without parameter, so the shell will automatically detect and use the version of python installed (Search sequence 2.7->3.4->3.5). Alternatively, you can use a parameter to specify the python version which you want to use like this: **sudo ./setup.sh [--python-version|-p] [2.7|3.4|3.5]**
 
+3. Install the requirements:
 
-    Known build issues:
-
-    1.) On building the Python client library (`iothub_client.so`) on Linux devices that have less than **1GB** RAM, you may see build getting **stuck** at **98%** while building `iothub_client_python.cpp` as shown below
-
-    ``[ 98%] Building CXX object python/src/CMakeFiles/iothub_client_python.dir/iothub_client_python.cpp.o``
-
-    If you run into this issue, check the **memory consumption** of the device using `free -m command` in another terminal window during that time. If you are running out of memory while compiling iothub_client_python.cpp file, you may have to temporarily increase the **swap space** to get more available memory to successfully build the Python client side device SDK library.
+   ```
+   pip install -r requirements.txt
+   ```
 
 ## Step 4: Run your client application
 
-Run the client application, and you need to provide your Azure IoT hub device connection string, note your connection string should be quoted in the command:
+Set your Azure IoT hub device connection string as `CONNECTION_STRING` in `config.py`, then run:
+
    ```
-   python app.py '<your Azure IoT hub device connection string>'
+   .venv/bin/python app.py
    ```
-If you use the python 3, then you can use the command below:
+
+Or, with the virtual environment activated:
+
    ```
-   python3 app.py '<your Azure IoT hub device connection string>'
+   python app.py
    ```
+
+On first run you are asked whether to send usage data to Microsoft; the answer is stored in `telemetry.config`.
 
 If the application works normally, then you will see the screen like this:
 
