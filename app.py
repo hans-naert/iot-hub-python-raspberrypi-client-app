@@ -103,7 +103,7 @@ def device_method_callback(method_request):
 
 def iothub_client_init():
     client = IoTHubDeviceClient.create_from_connection_string(
-        CONNECTION_STRING, product_info="HappyPath_RaspberryPi-Python")
+        CONNECTION_STRING, websockets=True, product_info="HappyPath_RaspberryPi-Python")
     device_method_callback.client = client
     client.on_message_received = receive_message_callback
     client.on_twin_desired_properties_patch_received = device_twin_callback
@@ -152,7 +152,7 @@ def iothub_client_sample_run():
     except KeyboardInterrupt:
         print ( "IoTHubClient sample stopped" )
     except Exception as iothub_error:
-        print ( "Unexpected error %s from IoTHub" % iothub_error )
+        print ( "Unexpected error %r from IoTHub" % iothub_error )
         telemetry.send_telemetry_data(parse_iot_hub_name(), EVENT_FAILED, "Unexpected error %s from IoTHub" % iothub_error)
     finally:
         if client:
