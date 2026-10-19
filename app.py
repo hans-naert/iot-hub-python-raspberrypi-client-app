@@ -15,6 +15,22 @@ from Adafruit_BME280 import *
 import re
 from telemetry import Telemetry
 
+import sys
+import time
+
+from smbus2 import SMBus
+
+
+TEMPERATURE_REGISTER = 0x00
+I2C_BUS = 1
+TC74_ADDRESS = 0x48
+READ_INTERVAL = 1
+
+
+def read_temperature(bus, address):
+    value = bus.read_byte_data(address, TEMPERATURE_REGISTER)
+    return value - 256 if value >= 128 else value
+
 # HTTP options
 # Because it can poll "after 9 seconds" polls will happen effectively
 # at ~10 seconds.
@@ -147,6 +163,9 @@ def iothub_client_sample_run():
                 SEND_CALLBACKS += 1
                 led_blink()
                 MESSAGE_COUNT += 1
+            with SMBus(I2C_BUS) as bus:    
+              temperature = read_temperature(bus, TC74_ADDRESS)    
+              client.patch_twin_reported_properties({"TC74": f"{temperature} C"})
             time.sleep(config.MESSAGE_TIMESPAN / 1000.0)
 
     except KeyboardInterrupt:
@@ -175,5 +194,8 @@ def parse_iot_hub_name():
 if __name__ == "__main__":
     print ( "\nPython %s" % sys.version )
     print ( "IoT Hub Client for Python" )
+    with SMBus(I2C_BUS) as bus:
+            temperature = read_temperature(bus, TC74_ADDRESS)
+            print(f"{temperature} C", flush=True)
 
     iothub_client_sample_run()
