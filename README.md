@@ -29,7 +29,7 @@ The application uses the [`azure-iot-device`](https://pypi.org/project/azure-iot
 1. Install `RPi.GPIO` from the OS packages and clone the application:
 
    ```
-   sudo apt-get install git python3-venv python3-rpi.gpio
+   sudo apt-get install git python3-venv python3-rpi-lgpio
    git clone https://github.com/hans-naert/iot-hub-python-raspberrypi-client-app.git
    cd iot-hub-python-raspberrypi-client-app
    ```
